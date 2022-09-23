@@ -6,54 +6,49 @@ import com.example.homework2_5.exception.EmployeeStorageFullException;
 import com.example.homework2_5.model.Employee;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class EmployeeService {
     private static final int SIZE = 6;
-    private final Employee[] employees;
+    private final List<Employee> employees;
 
     public EmployeeService() {
-        this.employees = new Employee[SIZE];
+        this.employees = new ArrayList<>();
     }
 
     public Employee add(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        int index = -1;
-        for (int i = 0; i < employees.length; i++) {
-            if (employees[i] == null && index == -1) {
-                index = 1;
-            }
-            if (employee.equals(employees[i])) {
-                throw new EmployeeAlreadyAddedException();
-            }
+        if (employees.contains(employee)) {
+            throw new EmployeeAlreadyAddedException();
         }
-        if (index == -1) {
-            throw new EmployeeStorageFullException();
+        if (employees.size() >= SIZE) {
+            throw new EmployeeAlreadyAddedException();
         }
-        employees[index] = employee;
+        employees.add(employee);
         return employee;
     }
 
     public Employee remove(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-
-        for (int i = 0; i < employees.length; i++) {
-
-            if (employee.equals(employees[i])) {
-                employees[i] = null;
-                return employee;
-            }
+        if (employees.contains(employee)) {
+            employees.remove(employee);
+            return employee;
         }
         throw new EmployeeNotFoundException();
     }
 
     public Employee find(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-
-        for (Employee i : employees) {
-            if (employee.equals(i)) {
-                return employee;
-            }
+        if (employees.contains(employee)) {
+            return employee;
         }
         throw new EmployeeNotFoundException();
+    }
+
+    public List<Employee> findAll() {
+        return List.of(employees.toArray(new Employee[0]));
     }
 }
